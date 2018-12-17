@@ -906,6 +906,53 @@ curl -X GET http://localhost:7203/actuator/channels
                 </aside>
             </section>
             <section>
+                <p>鏈路追蹤</p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>加入</p>
+                <pre><code class="xml" data-trim contenteditable>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
+                </code></pre>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>取得 spanTraceId</p>
+                <pre><code class="java" data-trim contenteditable>
+    @StreamListener(target = MqChannel.gameChannel)
+    @SendTo(MqChannel.resultChannel)
+    public Message< ResponseData> receiveGameCreateEvent(
+            Message GameCreateEvent> eventMessage) {
+        log.info("Message spanTraceId={}", eventMessage.getHeaders().get("spanTraceId"));
+        log.info("Message spanId={}", eventMessage.getHeaders().get("spanId"));
+        ResponseData responseData = new ResponseData()
+                .setEventId(gameCreateEvent.getEventId()).setCode("0")
+                .setMessage(gameCreateEvent.getGameName() + " 創建帳號已完成");
+        return MessageBuilder.withPayload(responseData)
+                .setHeader("username", username)
+                .build();
+    }
+                </code></pre>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>取得 spanTraceId 結果</p>
+                <pre><code class="shell" data-trim contenteditable>
+2018-12-17 11:31:59.718  INFO [gameservice-v1,2fff644a3967a533,868d7e1a8ca99ff0,false] 2052 --- [.v1.gameGroup-1]
+                    c.e.demo.consumer.GameEventReceiver      : Message spanTraceId=2fff644a3967a533
+2018-12-17 11:31:59.719  INFO [gameservice-v1,2fff644a3967a533,868d7e1a8ca99ff0,false] 2052 --- [.v1.gameGroup-1]
+                    c.e.demo.consumer.GameEventReceiver      : Message spanId=63a6cfa6e68c0253
+                </code></pre>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
                 <p>使用 Condition</p>
                 <pre><code class="java" data-trim contenteditable>
     @StreamListener(target = Processor.INPUT, condition = "headers['eventType']=='gameCreate'")
