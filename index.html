@@ -34,6 +34,50 @@
         </section>
         <section>
             <section>
+                <h3 class="em1">自我介紹</h3>
+            </section>
+            <section>
+                <p align="left">朱尚禮 Sam</p>
+                <p align="left">twitter:<a href="https://twitter.com/samzhu0318">@samzhu0318</a></p>
+                <p align="left">blog:<a href="http://samchu.logdown.com/">SAM的程式筆記</a></p>
+                <p align="left"><a href="https://github.com/samzhu">GitHub</a></p>
+                <p align="left">2016 Java Community Conference Taiwan Microservice & Cloud Native Speaker</p>
+                <p align="left"><a href="https://ithelp.ithome.com.tw/users/20107338/ironman/1445">2018 iT 邦幫忙鐵人賽 -
+                    30天從零開始 使用 Spring Boot 跟 Spring Cloud 建構完整微服務架構</a></p>
+            </section>
+            <section>
+                <p>Spring 的狂熱粉</p>
+            </section>
+            <section>
+                <p align="left">第一篇 Spring Boot</p>
+                <p align="left">2014年6月17日 <a
+                        href="http://samchu.logdown.com/posts/206297-use-spring-boot-to-quickly-build-web-applications">使用Spring-Boot快速建構Web應用</a>
+                </p>
+                <p align="left">第一篇 Spring Cloud</p>
+                <p align="left">2015年11月12日 <a
+                        href="http://samchu.logdown.com/posts/313414-microservice-with-springcloud">Microservice with
+                    SpringCloud</a></p>
+            </section>
+            <section>
+                <p>The Spring Blog</p>
+                <p align="left"><a
+                        href="https://spring.io/blog/2015/09/16/this-week-in-spring-september-15th-2015-springone2gx-2015-edition">This
+                    Chinese-language post on using Quartz with Spring Boot looks amazing</a></p>
+                <p align="left"><a href="https://spring.io/blog/2015/09/01/this-week-in-spring-september-1-2015">This
+                    blog looks at the Spring Cloud configuration server</a></p>
+                <p align="left"><a href="https://spring.io/blog/2015/08/12/this-week-in-spring-august-11-2015">check out
+                    this interesting Chinese-language post on using .yml with Spring Boot</a></p>
+                <p align="left"><a href="https://spring.io/blog/2017/01/10/this-week-in-spring-january-10th-2017">I
+                    liked Sam Chu’s Chinese-language post on setting up multiple MongoDB connections in a Spring
+                    application</a></p>
+            </section>
+            <section>
+                <p>一切都是</p>
+                <p>刻意練習</p>
+            </section>
+        </section>
+        <section>
+            <section>
                 <h3 class="em1">先談一下 Spring</h3>
             </section>
             <section>
@@ -692,7 +736,7 @@ spring:
         input:
           destination: chat.message.v1
           content-type: application/json
-          group: chatGroup                      # 綁定消費組
+          group: chatGroup    # 綁定消費組
           binder: eventMq
       binders:
         eventMq:
@@ -736,118 +780,52 @@ spring:
                 <aside class="notes">
                 </aside>
             </section>
+        </section>
+        <section>
             <section>
-                <p>例如</p>
-                <p>重試 死信</p>
+                <h3 class="em1">鏈路追蹤</h3>
                 <aside class="notes">
                 </aside>
             </section>
             <section>
-                <p>Consumer - application.yml</p>
-                <pre><code class="yml" data-trim contenteditable>
-spring:
-  application:
-    name: gameservice-v1
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
-  cloud:
-    stream:
-      bindings:
-        gameChannel:
-          destination: game.create.message.v1    # destination，或者可以認為是發布－訂閱模型裏面的topic
-          content-type: application/json
-          group: gameGroup    # 綁定消費組
-          consumer:
-            max-attempts: 3    # 默認為 3 次，1 表示禁用重試
-          binder: eventMq
-        resultChannel:
-          destination: result.message
-          content-type: application/json
-          producer:
-            required-groups: webGroup, resultGroup    # 預先建立的 group, 以免消息流失
-          binder: eventMq
-      binders:
-        eventMq:
-          type: rabbit    # rabbit or kafka
-          environment:
-            spring:
-              rabbitmq:
-                host: 192.168.56.101
-                port: 5672
-      rabbit:
-        bindings:
-          gameChannel:
-            producer:
-              auto-bind-dlq: true
-#              dead-letter-exchange: sam.test
-            consumer:
-              auto-bind-dlq: true    # 建立 Exchange: DLX
-#              dead-letter-exchange: sam.test    # 死信指定的 Exchange Name
-              republish-to-dlq: true    # 該值為false如果設置了死信隊列，消息對原封不動的發送到死信隊列，如果為true，則消息對帶上錯誤信息發送至死信隊列
-#              dlq-ttl: 10000     # 存活時間(毫秒)
+                <p>加入</p>
+                <pre><code class="xml" data-trim contenteditable>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+        </dependency>
                 </code></pre>
                 <aside class="notes">
-                    auto-bind-dlq 記得兩邊都要配置
                 </aside>
             </section>
             <section>
-                <p>DLX</p>
-                <img data-src="https://i.imgur.com/UrH4kI9.png" style="background-color: white" alt="DLX結構圖">
-                <aside class="notes">
-                </aside>
-            </section>
-            <section>
-                <p>重試結果</p>
-                <img data-src="https://i.imgur.com/aUOMkeV.png" alt="retry">
-                <aside class="notes">
-                </aside>
-            </section>
-            <section>
-                <p>republish-to-dlq=true</p>
-                <img data-src="https://i.imgur.com/wApU9GC.png" width="50%" alt="retry">
-                <aside class="notes">
-                </aside>
-            </section>
-            <section>
-                <p>game.create.message.v1.gameGroup.dlq</p>
-                <img data-src="https://i.imgur.com/AAZVnzc.pngg" width="200%" alt="retry">
-                <aside class="notes">
-                </aside>
-            </section>
-            <section>
-                <p>死信接收</p>
+                <p>取得 spanTraceId</p>
                 <pre><code class="java" data-trim contenteditable>
-@Slf4j
-@Component
-public class DlqResultReceiverAmqp {
-    private static final String ORIGINAL_QUEUE = "game.create.message.v1.gameGroup";
-    private static final String DLQ = ORIGINAL_QUEUE + ".dlq";
-
-    @RabbitListener(queues = DLQ)
-    public void receiveDLQResult(Message failedMessage) {
-        log.info("amqp spanTraceId={}", headers.get("spanTraceId"));
-        log.info("amqp spanId={}", headers.get("spanId"));
-        log.info("amqp x-exception-message={}", headers.get("x-exception-message"));
-        log.info("amqp x-exception-stacktrace={}", headers.get("x-exception-stacktrace"));
-        String messageBody = new String(failedMessage.getBody());
-        log.info("amqp messageBody={}", messageBody);
+    @StreamListener(target = MqChannel.gameChannel)
+    public void receiveGameCreateEvent(
+            Message GameCreateEvent> eventMessage) {
+        log.info("Message spanTraceId={}", eventMessage.getHeaders().get("spanTraceId"));
+        log.info("Message spanId={}", eventMessage.getHeaders().get("spanId"));
     }
-}
                 </code></pre>
                 <aside class="notes">
                 </aside>
             </section>
             <section>
-                <p>死信接收 使用 ServiceActivator </p>
-                <a href="https://mp.weixin.qq.com/s/7sILItNKJ_i9bCZ68vhErg">
-                    程序猿DD - Spring Cloud Stream消费失败后的处理策略（二）：自定义错误处理逻辑
-                </a>
+                <p>取得 spanTraceId 結果</p>
+                <pre><code class="shell" data-trim contenteditable>
+2018-12-17 11:31:59.718  INFO [gameservice-v1,2fff644a3967a533,868d7e1a8ca99ff0,false] 2052 --- [.v1.gameGroup-1]
+                    c.e.demo.consumer.GameEventReceiver      : Message spanTraceId=2fff644a3967a533
+2018-12-17 11:31:59.719  INFO [gameservice-v1,2fff644a3967a533,868d7e1a8ca99ff0,false] 2052 --- [.v1.gameGroup-1]
+                    c.e.demo.consumer.GameEventReceiver      : Message spanId=63a6cfa6e68c0253
+                </code></pre>
                 <aside class="notes">
                 </aside>
             </section>
+        </section>
+        <section>
             <section>
-                <p>監控</p>
+                <h3 class="em1">endpoint</h3>
                 <aside class="notes">
                 </aside>
             </section>
@@ -914,55 +892,178 @@ curl -X GET http://localhost:7203/actuator/channels
                 <aside class="notes">
                 </aside>
             </section>
+        </section>
+
+        <section>
             <section>
-                <p>鏈路追蹤</p>
+                <h3 class="em1">重試</h3>
                 <aside class="notes">
                 </aside>
             </section>
             <section>
-                <p>加入</p>
-                <pre><code class="xml" data-trim contenteditable>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-sleuth</artifactId>
-        </dependency>
+                <p>Consumer - application.yml</p>
+                <pre><code class="yml" data-trim contenteditable>
+spring:
+  autoconfigure:
+    exclude:    # 因為啟動會發生錯誤, 但是並不需要預設的 RabbitTemplate
+    - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+  cloud:
+    stream:
+      bindings:
+        input:    # channelName
+          destination: chat.message.v1    # destination，或者可以認為是發布－訂閱模型裏面的 topic
+          content-type: application/json
+          group: chatGroup    # 綁定消費組
+          consumer:
+            max-attempts: 3    # 默認為 3 次，1 表示禁用重試
+          binder: eventMq    # 綁定使用的binder
+      binders:
+        eventMq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 127.0.0.1
+                port: 5672
+                </code></pre>
+                <p>注意 max-attempts 配置</p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>重試結果</p>
+                <img data-src="https://i.imgur.com/zgJbJrB.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h3 class="em1">Dead letter exchanges (DLXs)</h3>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Consumer - application.yml</p>
+                <pre><code class="yml" data-trim contenteditable>
+spring:
+  autoconfigure:
+    exclude:    # 因為啟動會發生錯誤, 但是並不需要預設的 RabbitTemplate
+    - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+  cloud:
+    stream:
+      bindings:
+        input:    # channelName
+          destination: chat.message.v1    # destination，或者可以認為是發布－訂閱模型裏面的 topic
+          content-type: application/json
+          group: chatGroup    # 綁定消費組
+          consumer:
+            max-attempts: 3    # 默認為 3 次，1 表示禁用重試
+          binder: eventMq    # 綁定使用的binder
+      binders:
+        eventMq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 127.0.0.1
+                port: 5672
+      rabbit:
+        bindings:
+          input:    # 記得一定要對應到 channelName 才有效
+            producer:
+              auto-bind-dlq: true     # 記得 producer & consumer 兩邊都要配置, 不然會出現綁定錯誤
+            consumer:
+              auto-bind-dlq: true    # 建立 Exchange: DLX
+              republish-to-dlq: true    # 該值為false如果設置了死信隊列，消息對原封不動的發送到死信隊列，如果為true，則消息對帶上錯誤信息發送至死信隊列
+#              dlq-ttl: 10000     # 存活時間(毫秒)
                 </code></pre>
                 <aside class="notes">
+                    auto-bind-dlq 記得兩邊都要配置
                 </aside>
             </section>
             <section>
-                <p>取得 spanTraceId</p>
+                <p>DLX</p>
+                <img data-src="https://i.imgur.com/UrH4kI9.png" style="background-color: white" alt="DLX結構圖">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>測試結果</p>
+                <img data-src="https://i.imgur.com/qOwjllw.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>建立DLX</p>
+                <img data-src="https://i.imgur.com/RUuaVZk.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Routing key</p>
+                <img data-src="https://i.imgur.com/Jlpeiah.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Queue</p>
+                <img data-src="https://i.imgur.com/JFM3aoA.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Queue chat.message.v1.chatGroup.dlq</p>
+                <img data-src="https://i.imgur.com/P21G6U1.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>republish-to-dlq 的功用</p>
+                <img data-src="https://i.imgur.com/Oe5Zyqe.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>將錯誤的資訊發出去</p>
+                <img data-src="https://i.imgur.com/5mUgkBq.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>死信接收(Rabbit)</p>
                 <pre><code class="java" data-trim contenteditable>
-    @StreamListener(target = MqChannel.gameChannel)
-    @SendTo(MqChannel.resultChannel)
-    public Message< ResponseData> receiveGameCreateEvent(
-            Message GameCreateEvent> eventMessage) {
-        log.info("Message spanTraceId={}", eventMessage.getHeaders().get("spanTraceId"));
-        log.info("Message spanId={}", eventMessage.getHeaders().get("spanId"));
-        ResponseData responseData = new ResponseData()
-                .setEventId(gameCreateEvent.getEventId()).setCode("0")
-                .setMessage(gameCreateEvent.getGameName() + " 創建帳號已完成");
-        return MessageBuilder.withPayload(responseData)
-                .setHeader("username", username)
-                .build();
+@Slf4j
+@Component
+public class DlqResultReceiverAmqp {
+    private static final String ORIGINAL_QUEUE = "chat.message.v1.chatGroup";
+    private static final String DLQ = ORIGINAL_QUEUE + ".dlq";
+
+    @RabbitListener(queues = DLQ)
+    public void receiveDLQResult(Message failedMessage) {
+        log.info("amqp spanTraceId={}", headers.get("spanTraceId"));
+        log.info("amqp spanId={}", headers.get("spanId"));
+        log.info("amqp x-exception-message={}", headers.get("x-exception-message"));
+        log.info("amqp x-exception-stacktrace={}", headers.get("x-exception-stacktrace"));
+        String messageBody = new String(failedMessage.getBody());
+        log.info("amqp messageBody={}", messageBody);
     }
+}
                 </code></pre>
                 <aside class="notes">
                 </aside>
             </section>
+        </section>
+
+        <section>
             <section>
-                <p>取得 spanTraceId 結果</p>
-                <pre><code class="shell" data-trim contenteditable>
-2018-12-17 11:31:59.718  INFO [gameservice-v1,2fff644a3967a533,868d7e1a8ca99ff0,false] 2052 --- [.v1.gameGroup-1]
-                    c.e.demo.consumer.GameEventReceiver      : Message spanTraceId=2fff644a3967a533
-2018-12-17 11:31:59.719  INFO [gameservice-v1,2fff644a3967a533,868d7e1a8ca99ff0,false] 2052 --- [.v1.gameGroup-1]
-                    c.e.demo.consumer.GameEventReceiver      : Message spanId=63a6cfa6e68c0253
-                </code></pre>
+                <h3 class="em1">Condition</h3>
                 <aside class="notes">
                 </aside>
             </section>
             <section>
-                <p>使用 Condition</p>
+                <p>支援 SpEL </p>
                 <pre><code class="java" data-trim contenteditable>
     @StreamListener(target = Processor.INPUT, condition = "headers['eventType']=='gameCreate'")
     public void createGamePlus(
@@ -981,7 +1082,30 @@ curl -X GET http://localhost:7203/actuator/channels
                 </aside>
             </section>
             <section>
-                <p>測試</p>
+                <p class="em2">為 事件驅動 鋪路?</p>
+                <img data-src="https://i.imgur.com/NuWlebS.png" alt="未來">
+                <p>
+                    <a href="https://cloud.tencent.com/developer/article/1082825">
+                        针对事件驱动架构的Spring Cloud Stream - 云+社区 - 腾讯云
+                    </a>
+                </p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>等下來介紹 事件驅動</p>
+                <aside class="notes">
+                </aside>
+            </section>
+        </section>
+
+        <section>
+            <section>
+                <h3 class="em1">測試</h3>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
                 <p>
                     <small>可不依賴 RabbitMQ 進行測試</small>
                 </p>
@@ -1031,6 +1155,122 @@ public class ExampleTest {
                 </aside>
             </section>
         </section>
+
+        <section>
+            <section>
+                <h3 class="em1">如果我不想直接重試 想讓消息重新排隊呢?</h3>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Consumer - application.yml</p>
+                <pre><code class="yml" data-trim contenteditable>
+spring:
+  autoconfigure:
+    exclude:    # 因為啟動會發生錯誤, 但是並不需要預設的 RabbitTemplate
+    - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+  cloud:
+    stream:
+      bindings:
+        input:    # channelName
+          destination: chat.message.v1    # destination，或者可以認為是發布－訂閱模型裏面的 topic
+          content-type: application/json
+          group: chatGroup    # 綁定消費組
+          consumer:
+            max-attempts: 1    # 默認為 3 次，1 表示禁用重試
+          binder: eventMq    # 綁定使用的binder
+      binders:
+        eventMq:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 127.0.0.1
+                port: 5672
+      rabbit:
+        bindings:
+          input:
+            producer:
+              auto-bind-dlq: true
+            consumer:
+              auto-bind-dlq: true    # 建立 Exchange: DLX
+#              republish-to-dlq: true    # 無法共用
+              requeue-rejected: true    # 消息消費失敗之後，並不會將該消息拋棄，而是將消息重新放入隊列
+                </code></pre>
+                <aside class="notes">
+                    requeue-rejected
+                </aside>
+            </section>
+            <section>
+                <p>requeue-rejected</p>
+                <p>消息消費失敗之後，並不會將該消息拋棄，而是將消息重新放入隊列</p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>重複循環</p>
+                <img data-src="https://i.imgur.com/C0bFmT7.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <img data-src="https://www.hahatai.com/sites/default/files/u1031/2_5.jpg" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>
+                    <small>利用 AmqpRejectAndDontRequeueException</small>
+                </p>
+                <pre><code class="java" data-trim contenteditable>
+@Component
+public class ChatReceiver {
+    // 放 Redis 之類
+    private Map< String, Integer> redis = new HashMap();
+
+    @StreamListener(target = Sink.INPUT)
+    public void chatReceive(Message< String> chatMessage) {
+        System.out.println(LocalDateTime.now() + " 收到: " + chatMessage.getPayload());
+        Integer retries = 0;
+        // 這邊應該用雪花算法或是雜湊
+        if (redis.get(chatMessage.getPayload()) != null) {
+            retries = redis.get(chatMessage.getPayload());
+        }
+        if (retries == 3) {
+            throw new AmqpRejectAndDontRequeueException("tried 3 times failed, send to dlq!");
+        } else {
+            retries = retries + 1;
+            redis.put(chatMessage.getPayload(), retries);
+            throw new RuntimeException("Message consumer failed!");
+        }
+    }
+}
+                </code></pre>
+                <p>
+                    <small>
+                        <a href="http://blog.didispace.com/spring-cloud-starter-finchley-7-5/">
+                            http://blog.didispace.com/spring-cloud-starter-finchley-7-5/
+                        </a>
+                    </small>
+                </p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <img data-src="https://i.imgur.com/t0GP4Dg.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>
+                    <small>沒有 republish-to-dlq</small>
+                </p>
+                <img data-src="https://i.imgur.com/KcEMnct.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+        </section>
+
         <section>
             <section>
                 <h3 class="em1">補充</h3>
@@ -1038,13 +1278,24 @@ public class ExampleTest {
                 </aside>
             </section>
             <section>
-                <p class="em2">下一步?</p>
+                <p class="em2">事件驅動?</p>
                 <img data-src="https://i.imgur.com/NuWlebS.png" alt="未來">
                 <p>
                     <a href="https://cloud.tencent.com/developer/article/1082825">
                         针对事件驱动架构的Spring Cloud Stream - 云+社区 - 腾讯云
                     </a>
                 </p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Spring Data 開始有 @DomainEvents ?</p>
+                <p>
+                    <a href="https://www.baeldung.com/spring-data-ddd">
+                        DDD aggregates and @DomainEvents | Baeldung
+                    </a>
+                </p>
+                <p>Spring Cloud Stream 可以用 condition</p>
                 <aside class="notes">
                 </aside>
             </section>
@@ -1072,6 +1323,16 @@ public class ExampleTest {
                 </aside>
             </section>
             <section>
+                <p>Axon</p>
+                <p>
+                    <a href="https://www.youtube.com/watch?v=7e5euKxHhTE&t=47s">
+                        Bootiful CQRS and Event Sourcing with Axon Framework
+                    </a>
+                </p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
                 <p>FB</p>
                 <img data-src="https://i.imgur.com/UudkJu4.png" width="40%" alt="FB">
                 <p>
@@ -1085,17 +1346,69 @@ public class ExampleTest {
                             facebook - Domain Driven Design(Taiwan)
                         </a>
                     </small>
-
                 </p>
                 <aside class="notes">
                 </aside>
             </section>
         </section>
         <section>
-            <p>謝謝指教</p>
-            <aside class="notes">
-            </aside>
+            <section>
+                <h3 class="em1">小小心得分享</h3>
+                <aside class="notes">
+                    前面講的刻意練習
+                </aside>
+            </section>
+            <section>
+                <p>來源</p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Josh Long</p>
+                <img data-src="https://i.imgur.com/0qpZjJZ.png" alt="">
+                <p><a href="https://twitter.com/starbuxman">@starbuxman</a></p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>YouTube</p>
+                <img data-src="https://i.imgur.com/W5roSze.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>YouTube</p>
+                <p align="left"><a href="https://www.youtube.com/channel/UC7yfnfvEUlXUIfm8rGLwZdA">SpringDeveloper</a>
+                </p>
+                <p align="left"><a href="https://www.youtube.com/channel/UCLMPXsvSrhNPN3i9h-u8PYg">Spring I/O</a></p>
+                <p align="left"><a href="https://www.youtube.com/channel/UCrXb8NaMPQCQkT8yMP_hSkw">Spring Framework
+                    Guru</a></p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Spring 官方 blog</p>
+                <p align="left"><a href="https://spring.io/blog">https://spring.io/blog</a></p>
+                <p align="left">Josh Long 的 This Week in Spring</p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>近期演講</p>
+                <p align="left"><a
+                        href="https://v.qq.com/x/page/k0782bocg8j.html?fbclid=IwAR3A8VghLpkeTOHAkumqhSfl8Bvrfh8LWQn3c1cM_FXot6WyEEOWyIcLfo4">云原生Spring_腾讯视频</a>
+                </p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>謝謝指教</p>
+                <img data-src="https://i.imgur.com/JwpoPyt.jpg" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
         </section>
+
     </div>
 </div>
 <script src="lib/js/head.min.js"></script>
