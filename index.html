@@ -435,6 +435,8 @@ spring:
         output:    # channelName
           destination: chat.message.v1    # destination，或者可以認為是發布－訂閱模型裏面的topic
           content-type: application/json
+          producer:
+            required-groups: chatGroup    # 生產者必須確保消息傳遞的組群列表（逗號分隔），即使它們是在創建之後啟動的（例如，通過在RabbitMQ中預先創建持久隊列）。
           binder: eventMq    # 綁定使用的binder
       binders:
         eventMq:
