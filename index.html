@@ -1209,12 +1209,7 @@ spring:
             </section>
             <section>
                 <p>重複循環</p>
-                <img data-src="https://i.imgur.com/C0bFmT7.png" alt="">
-                <aside class="notes">
-                </aside>
-            </section>
-            <section>
-                <img data-src="https://www.hahatai.com/sites/default/files/u1031/2_5.jpg" alt="">
+                <img data-src="https://i.imgur.com/zDWaL1O.png" alt="">
                 <aside class="notes">
                 </aside>
             </section>
@@ -1266,6 +1261,64 @@ public class ChatReceiver {
                     <small>沒有 republish-to-dlq</small>
                 </p>
                 <img data-src="https://i.imgur.com/KcEMnct.png" alt="">
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>另一種 </p>
+                <p><a href="https://www.e4developer.com/2018/02/05/handling-bad-messages-with-rabbitmq-and-spring-cloud-stream/"></a></p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>結合 Condition 處理</p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <pre><code class="java" data-trim contenteditable>
+@Component
+public class ChatReceiver {
+    @Autowired
+    private Processor processor;
+
+    @StreamListener(target = Processor.INPUT, condition = "headers['x-retries'] == null or headers['x-retries'] < 3")
+    public void chatReceive(Message< String> chatMessage) {
+        System.out.println(LocalDateTime.now() + " 收到: " + chatMessage.getPayload());
+        System.out.println(LocalDateTime.now() + " 收到 x-retries: " + chatMessage.getHeaders().get("x-retries"));
+        // 假設出錯自己丟回 MQ
+        Integer retries = 0;
+        if (chatMessage.getHeaders().get("x-retries") != null) {
+            retries = (Integer) chatMessage.getHeaders().get("x-retries") + 1;
+        }
+        Message< String> message = MessageBuilder.withPayload(chatMessage.getPayload())
+                .setHeader("x-retries", retries)
+                .build();
+        processor.output().send(message);
+    }
+
+    @StreamListener(target = Processor.INPUT, condition = "headers['x-retries'] >= 3")
+    public void chatReceiveDl(Message< String> chatMessage) {
+        System.out.println(LocalDateTime.now() + " DLQ 收到: " + chatMessage.getPayload());
+        System.out.println(LocalDateTime.now() + " DLQ 收到 x-retries: " + chatMessage.getHeaders().get("x-retries"));
+    }
+                </code></pre>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <pre><code class="shell" data-trim contenteditable>
+            2018-12-21T12:12:33.842 收到: Hi!!
+            2018-12-21T12:12:33.842 收到 x-retries: null
+            2018-12-21T12:12:33.854 收到: Hi!!
+            2018-12-21T12:12:33.854 收到 x-retries: 0
+            2018-12-21T12:12:33.855 收到: Hi!!
+            2018-12-21T12:12:33.855 收到 x-retries: 1
+            2018-12-21T12:12:33.857 收到: Hi!!
+            2018-12-21T12:12:33.857 收到 x-retries: 2
+            2018-12-21T12:12:33.858 DLQ 收到: Hi!!
+            2018-12-21T12:12:33.858 DLQ 收到 x-retries: 3
+                </code></pre>
                 <aside class="notes">
                 </aside>
             </section>
@@ -1359,11 +1412,6 @@ public class ChatReceiver {
                 </aside>
             </section>
             <section>
-                <p>來源</p>
-                <aside class="notes">
-                </aside>
-            </section>
-            <section>
                 <p>Josh Long</p>
                 <img data-src="https://i.imgur.com/0qpZjJZ.png" alt="">
                 <p><a href="https://twitter.com/starbuxman">@starbuxman</a></p>
@@ -1397,6 +1445,17 @@ public class ChatReceiver {
                 <p>近期演講</p>
                 <p align="left"><a
                         href="https://v.qq.com/x/page/k0782bocg8j.html?fbclid=IwAR3A8VghLpkeTOHAkumqhSfl8Bvrfh8LWQn3c1cM_FXot6WyEEOWyIcLfo4">云原生Spring_腾讯视频</a>
+                </p>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>其他網站</p>
+                <p align="left">
+                    <a href="http://springcloud.cn/">Spring Cloud中国社区</a>
+                </p>
+                <p align="left">
+                    <a href="http://blog.didispace.com/">程序猿DD</a>
                 </p>
                 <aside class="notes">
                 </aside>
