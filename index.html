@@ -1335,6 +1335,58 @@ public class ChatReceiver {
                 </aside>
             </section>
         </section>
+        <section>
+            <section>
+                <h3 class="em1">ack操作</h3>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <p>Consumer - application.yml</p>
+                <pre><code class="yml" data-trim contenteditable>
+      rabbit:
+        bindings:
+          input:
+            producer:
+              auto-bind-dlq: true
+            consumer:
+              auto-bind-dlq: true    # 建立 Exchange: DLX
+              republish-to-dlq: true    # 該值為false如果設置了死信隊列，消息對原封不動的發送到死信隊列，如果為true，則消息對帶上錯誤信息發送至死信隊列
+              acknowledge-mode: MANUAL  # 設定為手動
+                </code></pre>
+                <aside class="notes">
+                </aside>
+            </section>
+            <section>
+                <pre><code class="java" data-trim contenteditable>
+import com.rabbitmq.client.Channel;
+import org.springframework.amqp.support.AmqpHeaders;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.messaging.Sink;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.handler.annotation.Header;
+
+@Component
+public class ChatReceiver {
+
+    @StreamListener(target = Sink.INPUT)
+    public void chatReceive(
+            Message< String> chatMessage,
+            @Header(AmqpHeaders.CHANNEL) Channel channel,
+            @Header(AmqpHeaders.DELIVERY_TAG) Long deliveryTag) throws IOException {
+        System.out.println(LocalDateTime.now() + " 收到: " + chatMessage.getPayload());
+        channel.basicAck(deliveryTag, false);
+        /**
+         *第一个参数deliveryTag：发布的每一条消息都会获得一个唯一的deliveryTag，deliveryTag在channel范围内是唯一的
+         * 第二个参数requeue：表示如何处理这条消息，如果值为true，则重新放入RabbitMQ的发送队列，如果值为false，则通知RabbitMQ销毁这条消息
+         */
+    }
+}
+                </code></pre>
+                <aside class="notes">
+                </aside>
+            </section>
+        </section>
 
         <section>
             <section>
